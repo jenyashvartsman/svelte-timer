@@ -5,7 +5,7 @@
 </script>
 
 <div class="list">
-  {#each timers as timer}
+  {#each timers as timer, i}
     <TimerCard {timer} />
   {/each}
 </div>
