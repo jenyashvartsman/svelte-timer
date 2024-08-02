@@ -1,69 +1,107 @@
 <script lang="ts">
   import { createEventDispatcher } from "svelte";
+  import TimerInputItem from "./TimerInputItem.svelte";
 
-  export let value: number = 0;
-  export let valueType: "M" | "S";
-  export let addDisabled = false;
-  export let subtractDisabled = false;
+  export let timer: number = 0;
 
   const dispatch = createEventDispatcher();
 
-  $: format = (): string => {
-    const valueStr = value > 9 ? `${value}` : `0${value}`;
-    return `${valueStr}${valueType}`;
-  };
+  let minutes: number;
+  let minutesAddDisabled = false;
+  let minutesSubtractDisabled = false;
 
-  function handleClick(addToValue: number): void {
-    dispatch("valueChanged", addToValue);
+  let seconds: number;
+  let secondsAddDisabled = false;
+  let secondsSubtractDisabled = false;
+
+  $: {
+    minutes = Math.floor(timer / 60);
+    seconds = timer % 60;
+
+    secondsSubtractDisabled = seconds === 0;
+    secondsAddDisabled = minutes === 59 && seconds === 59;
+
+    minutesSubtractDisabled = minutes === 0;
+    minutesAddDisabled = minutes === 59;
+  }
+
+  function minutesChanged(e: CustomEvent): void {
+    const seconds = e.detail * 60;
+    timer += seconds;
+  }
+
+  function secondsChanged(e: CustomEvent): void {
+    timer += e.detail;
+  }
+
+  function handleStartClick(): void {
+    dispatch("addTimer", timer);
+    timer = 0;
   }
 </script>
 
-<div class="input">
-  <button
-    class="input__btn"
-    on:click={() => handleClick(1)}
-    disabled={addDisabled}
-  >
-    <span class="material-symbols-outlined"> add </span>
-  </button>
+<div class="timer">
+  <div class="timer__inputsWrapper">
+    <TimerInputItem
+      value={minutes}
+      valueType="M"
+      addDisabled={minutesAddDisabled}
+      subtractDisabled={minutesSubtractDisabled}
+      on:valueChanged={minutesChanged}
+    />
 
-  <span class="input__value">{format()}</span>
+    <TimerInputItem
+      value={seconds}
+      valueType="S"
+      addDisabled={secondsAddDisabled}
+      subtractDisabled={secondsSubtractDisabled}
+      on:valueChanged={secondsChanged}
+    />
+  </div>
 
   <button
-    class="input__btn"
-    on:click={() => handleClick(-1)}
-    disabled={subtractDisabled}
+    class="timer__start"
+    on:click={handleStartClick}
+    disabled={timer === 0}
   >
-    <span class="material-symbols-outlined"> remove </span>
+    Start
   </button>
 </div>
 
 <style>
-  .input {
+  .timer {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2rem;
+  }
+
+  .timer__inputsWrapper {
     display: flex;
     align-items: center;
     justify-content: center;
-    flex-direction: column;
-    gap: 0.5rem;
+    gap: 3rem;
   }
 
-  .input__btn {
-    background-color: var(--color-highlight-primary);
-    border: 1px solid var(--color-highlight-primary);
+  .timer__start {
+    font-size: 1rem;
+    font-weight: 500;
+    background-color: transparent;
+    color: var(--color-highlight-secondary);
+    border: 1px solid var(--color-border);
     border-radius: 4px;
-    height: 32px;
-    width: 32px;
+    padding: 0.5rem 2rem;
+    box-shadow: var(--box-shadow);
     cursor: pointer;
     transition: all ease-in-out 200ms;
   }
 
-  .input__btn:hover:not(:disabled) {
-    background-color: transparent;
-    color: var(--color-highlight-primary);
+  .timer__start:hover:not(:disabled) {
+    border-color: var(--color-highlight-primary);
   }
 
-  .input__btn:disabled {
-    opacity: 0.9;
+  .timer__start:disabled {
+    opacity: 0.5;
     cursor: not-allowed;
   }
 </style>

@@ -1,5 +1,5 @@
 <script lang="ts">
-  import Timer from "./lib/components/Timer.svelte";
+  import TimerInput from "./lib/components/TimerInput.svelte";
   import TimersList from "./lib/components/TimersList.svelte";
 
   let newTimer = 0; // in seconds
@@ -11,7 +11,7 @@
 </script>
 
 <main class="container">
-  <Timer timer={newTimer} on:addTimer={(e) => addTimer(e.detail)} />
+  <TimerInput timer={newTimer} on:addTimer={(e) => addTimer(e.detail)} />
   <TimersList {timers} />
 </main>
 
