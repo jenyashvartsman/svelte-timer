@@ -1,15 +1,39 @@
 <script lang="ts">
-  let value: number = 0;
+  import { createEventDispatcher } from "svelte";
+
+  export let value: number = 0;
+  export let valueType: "M" | "S";
+  export let addDisabled = false;
+  export let subtractDisabled = false;
+
+  const dispatch = createEventDispatcher();
+
+  $: format = (): string => {
+    const valueStr = value > 9 ? `${value}` : `0${value}`;
+    return `${valueStr}${valueType}`;
+  };
+
+  function handleClick(addToValue: number): void {
+    dispatch("valueChanged", addToValue);
+  }
 </script>
 
 <div class="input">
-  <button class="input__btn">
+  <button
+    class="input__btn"
+    on:click={() => handleClick(1)}
+    disabled={addDisabled}
+  >
     <span class="material-symbols-outlined"> add </span>
   </button>
 
-  <span class="input__value">{value}</span>
+  <span class="input__value">{format()}</span>
 
-  <button class="input__btn">
+  <button
+    class="input__btn"
+    on:click={() => handleClick(-1)}
+    disabled={subtractDisabled}
+  >
     <span class="material-symbols-outlined"> remove </span>
   </button>
 </div>
@@ -33,8 +57,13 @@
     transition: all ease-in-out 200ms;
   }
 
-  .input__btn:hover {
+  .input__btn:hover:not(:disabled) {
     background-color: transparent;
     color: var(--color-highlight-primary);
+  }
+
+  .input__btn:disabled {
+    opacity: 0.9;
+    cursor: not-allowed;
   }
 </style>

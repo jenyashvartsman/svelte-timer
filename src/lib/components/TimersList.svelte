@@ -1,8 +1,7 @@
 <script lang="ts">
-  import type { TimerDto } from "../dto/timer.dto";
   import TimerCard from "./TimerCard.svelte";
 
-  const timers: number[] = [50, 85, 90];
+  export let timers: number[] = [];
 </script>
 
 <div class="list">

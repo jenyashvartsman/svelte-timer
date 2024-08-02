@@ -1,16 +1,26 @@
 <script lang="ts">
   export let timer: number;
 
-  let timeLeft = 30;
+  let timeLeft: number;
+  let activeWidth: string;
 
-  $: progress = `${((timeLeft / timer) * 100).toFixed(2)}%`;
+  $: {
+    timeLeft = timer;
+    activeWidth = `${((timeLeft / timer) * 100).toFixed(2)}%`;
+  }
+
+  $: format = (): string => {
+    const minutes = Math.floor(timeLeft / 60);
+    const seconds = timeLeft % 60;
+    return `${minutes > 9 ? minutes : "0" + minutes} minutes ${seconds > 9 ? seconds : "0" + seconds} seconds`;
+  };
 </script>
 
 <div class="card">
   <div class="card__top">
     <h3 class="card__timeLeft">
       <span class="material-symbols-outlined"> notifications </span>
-      <span>{timeLeft}</span>
+      <span>{format()}</span>
     </h3>
     <div class="card_actions">
       <button class="card__btn">
@@ -29,7 +39,7 @@
 
   <div class="card__bottom">
     <div class="card__progress">
-      <div class="card__progress-active" style="width: {progress};"></div>
+      <div class="card__progress-active" style="width: {activeWidth};"></div>
     </div>
   </div>
 </div>
